@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Switch } from "@/components/ui/switch";
 import LookTitle from "@/components/LookTitle";
+import DeleteLookButton from "@/components/DeleteLookButton";
 
 export default function MyLooks() {
   const [authed, setAuthed] = useState(null);
@@ -31,6 +32,18 @@ export default function MyLooks() {
   const rename = async (upload, caption) => {
     setUploads((prev) => prev.map((u) => (u.id === upload.id ? { ...u, caption } : u)));
     await base44.entities.Upload.update(upload.id, { caption });
+  };
+
+  const remove = async (upload) => {
+    const items = await base44.entities.DetectedItem.filter({ upload_id: upload.id });
+    if (items.length > 0) {
+      await base44.entities.ProductMatch.deleteMany({
+        detected_item_id: { $in: items.map((i) => i.id) },
+      });
+      await base44.entities.DetectedItem.deleteMany({ upload_id: upload.id });
+    }
+    await base44.entities.Upload.delete(upload.id);
+    setUploads((prev) => prev.filter((u) => u.id !== upload.id));
   };
 
   const toggle = async (upload) => {
@@ -86,6 +99,10 @@ export default function MyLooks() {
                   {u.is_public ? "Public" : "Private"}
                 </span>
                 <Switch checked={!!u.is_public} onCheckedChange={() => toggle(u)} />
+                <DeleteLookButton
+                  label={u.caption || "this look"}
+                  onConfirm={() => remove(u)}
+                />
               </div>
             </li>
           ))}
