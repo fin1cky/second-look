@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { Switch } from "@/components/ui/switch";
+import LookTitle from "@/components/LookTitle";
 
 export default function MyLooks() {
   const [authed, setAuthed] = useState(null);
@@ -26,6 +27,11 @@ export default function MyLooks() {
       setLabels(grouped);
     })();
   }, []);
+
+  const rename = async (upload, caption) => {
+    setUploads((prev) => prev.map((u) => (u.id === upload.id ? { ...u, caption } : u)));
+    await base44.entities.Upload.update(upload.id, { caption });
+  };
 
   const toggle = async (upload) => {
     const next = !upload.is_public;
@@ -60,9 +66,7 @@ export default function MyLooks() {
                 <img src={u.image_url} alt="" className="w-20 h-24 object-cover bg-neutral-100" />
               </Link>
               <div className="flex-1 min-w-0">
-                <Link to={`/results?id=${u.id}`} className="font-display text-lg hover:opacity-60">
-                  {u.caption || "Untitled look"}
-                </Link>
+                <LookTitle upload={u} onRename={(name) => rename(u, name)} />
                 {!u.caption && (labels[u.id]?.length > 0) && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {labels[u.id].slice(0, 4).map((l, idx) => (
