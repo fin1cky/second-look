@@ -67,7 +67,7 @@ export default function MyLooks() {
               </Link>
               <div className="flex-1 min-w-0">
                 <LookTitle upload={u} onRename={(name) => rename(u, name)} />
-                {!u.caption && (labels[u.id]?.length > 0) && (
+                {labels[u.id]?.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-2">
                     {labels[u.id].slice(0, 4).map((l, idx) => (
                       <span
