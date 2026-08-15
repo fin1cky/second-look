@@ -54,12 +54,12 @@ export default function Layout() {
                 Sign out
               </button>
             ) : (
-              <button
-                onClick={() => base44.auth.redirectToLogin()}
+              <Link
+                to={`/login?returnTo=${encodeURIComponent(pathname)}`}
                 className="text-[11px] uppercase tracking-[0.16em] text-neutral-500 hover:text-neutral-900"
               >
                 Sign in
-              </button>
+              </Link>
             )}
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { ImagePlus } from "lucide-react";
 
@@ -44,12 +44,12 @@ export default function UploadPhoto() {
         <p className="text-neutral-500 text-sm mb-8">
           Browsing is open to everyone. Uploading your own photos needs an account.
         </p>
-        <button
-          onClick={() => base44.auth.redirectToLogin()}
-          className="bg-[#d1490f] text-white px-7 py-3 text-[11px] uppercase tracking-[0.18em]"
+        <Link
+          to={`/login?returnTo=${encodeURIComponent("/upload")}`}
+          className="inline-block bg-[#d1490f] text-white px-7 py-3 text-[11px] uppercase tracking-[0.18em]"
         >
           Sign in
-        </button>
+        </Link>
       </div>
     );
   }

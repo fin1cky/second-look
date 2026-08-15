@@ -27,12 +27,12 @@ export default function MyLooks() {
     return (
       <div className="max-w-md mx-auto px-6 py-32 text-center">
         <h1 className="font-display text-3xl mb-6">Your looks live here</h1>
-        <button
-          onClick={() => base44.auth.redirectToLogin()}
-          className="bg-[#d1490f] text-white px-7 py-3 text-[11px] uppercase tracking-[0.18em]"
+        <Link
+          to={`/login?returnTo=${encodeURIComponent("/my-looks")}`}
+          className="inline-block bg-[#d1490f] text-white px-7 py-3 text-[11px] uppercase tracking-[0.18em]"
         >
           Sign in
-        </button>
+        </Link>
       </div>
     );
   }
