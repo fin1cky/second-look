@@ -7,16 +7,20 @@ export default function Discover() {
   const [counts, setCounts] = useState({});
   const [loading, setLoading] = useState(true);
 
+  const load = async () => {
+    const list = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 3);
+    setUploads(list);
+    const items = await base44.entities.DetectedItem.list("-created_date", 500);
+    const map = {};
+    items.forEach((i) => (map[i.upload_id] = (map[i.upload_id] || 0) + 1));
+    setCounts(map);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    (async () => {
-      const list = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 3);
-      setUploads(list);
-      const items = await base44.entities.DetectedItem.list("-created_date", 500);
-      const map = {};
-      items.forEach((i) => (map[i.upload_id] = (map[i.upload_id] || 0) + 1));
-      setCounts(map);
-      setLoading(false);
-    })();
+    load();
+    const unsubscribe = base44.entities.Upload.subscribe(() => load());
+    return unsubscribe;
   }, []);
 
   return (
