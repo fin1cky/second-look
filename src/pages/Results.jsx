@@ -42,6 +42,7 @@ export default function Results() {
   };
 
   const primary = matches.filter((m) => m.tier === "primary").sort((a, b) => a.price - b.price);
+  const mid = matches.filter((m) => m.tier === "mid").sort((a, b) => a.price - b.price);
   const budget = matches.filter((m) => m.tier === "budget").sort((a, b) => a.price - b.price);
   const savings =
     primary.length && budget.length
@@ -91,6 +92,17 @@ export default function Results() {
               ))}
             </div>
           </section>
+
+          {mid.length > 0 && (
+            <section className="mb-20">
+              <h2 className="font-display text-2xl sm:text-3xl mb-8">Similar, less</h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
+                {mid.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="-mx-5 sm:-mx-8 px-5 sm:px-8 py-14 bg-[#faf2ec] border-y border-[#e8d5c7]">
             <div className="flex flex-wrap items-baseline gap-4 mb-8">

@@ -29,16 +29,17 @@ export default async function(req) {
     }
 
     const data = await res.json();
-    // Service returns { primary: [...], budget: [...] }.
+    // Service returns { primary: [...], mid: [...], budget: [...] }.
     const matches = [
       ...(data.primary || []).map((m) => ({ ...m, tier: 'primary' })),
+      ...(data.mid || []).map((m) => ({ ...m, tier: 'mid' })),
       ...(data.budget || []).map((m) => ({ ...m, tier: 'budget' }))
     ];
 
     const created = matches.length
       ? await base44.asServiceRole.entities.ProductMatch.bulkCreate(matches.map((m) => ({
           detected_item_id,
-          tier: m.tier === 'budget' ? 'budget' : 'primary',
+          tier: m.tier,
           title: m.title,
           brand: m.brand,
           price: m.price,
