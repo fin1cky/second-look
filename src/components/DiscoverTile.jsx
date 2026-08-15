@@ -6,12 +6,12 @@ export default function DiscoverTile({ upload, count }) {
   return (
     <Link
       to={`/results?id=${upload.id}`}
-      className="mb-3 block break-inside-avoid group relative overflow-hidden bg-neutral-100"
+      className="block group relative overflow-hidden bg-neutral-100"
     >
       <Image
         src={upload.image_url}
         alt={upload.caption || "look"}
-        className="w-full transition-transform duration-700 group-hover:scale-[1.03]"
+        className="w-full aspect-[3/4] object-cover transition-transform duration-700 group-hover:scale-[1.03]"
       />
       <span className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 text-[10px] tracking-[0.12em] text-neutral-800">
         {count} {count === 1 ? "ITEM" : "ITEMS"}

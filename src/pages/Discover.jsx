@@ -9,7 +9,7 @@ export default function Discover() {
 
   useEffect(() => {
     (async () => {
-      const list = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 60);
+      const list = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 3);
       setUploads(list);
       const items = await base44.entities.DetectedItem.list("-created_date", 500);
       const map = {};
@@ -38,11 +38,21 @@ export default function Discover() {
       ) : uploads.length === 0 ? (
         <div className="py-20 text-center text-neutral-400">No public looks yet.</div>
       ) : (
-        <div className="columns-2 md:columns-3 lg:columns-4 gap-3">
-          {uploads.map((u) => (
-            <DiscoverTile key={u.id} upload={u} count={counts[u.id] || 0} />
-          ))}
-        </div>
+        <section>
+          <div className="flex items-baseline justify-between border-b border-neutral-200 pb-4 mb-8">
+            <h2 className="font-display text-2xl sm:text-3xl tracking-tight">This week's looks</h2>
+            <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-400">Selected</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-5">
+            {uploads.map((u) => (
+              <DiscoverTile key={u.id} upload={u} count={counts[u.id] || 0} />
+            ))}
+          </div>
+          <p className="mt-8 text-xs text-neutral-400 leading-relaxed max-w-md">
+            Public looks from people using Second Look appear here. Share one of your own from My
+            looks.
+          </p>
+        </section>
       )}
     </div>
   );

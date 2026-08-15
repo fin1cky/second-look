@@ -26,7 +26,7 @@ export default function UploadPhoto() {
       const upload = await base44.entities.Upload.create({
         image_url: file_url,
         caption,
-        is_public: true,
+        is_public: false,
         status: "analyzing",
       });
       await base44.functions.invoke("analyzeUpload", { upload_id: upload.id });
@@ -111,6 +111,9 @@ export default function UploadPhoto() {
             placeholder="Add a caption (optional)"
             className="mt-6 w-full bg-transparent border-b border-neutral-300 py-3 text-sm focus:outline-none focus:border-neutral-900"
           />
+          <p className="mt-4 text-xs text-neutral-400">
+            Private by default. You can share it to Discover later.
+          </p>
         </>
       )}
     </div>

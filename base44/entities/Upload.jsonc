@@ -12,7 +12,7 @@
     },
     "is_public": {
       "type": "boolean",
-      "default": true
+      "default": false
     },
     "status": {
       "type": "string",
