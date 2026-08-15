@@ -78,7 +78,7 @@ export default function Layout() {
       </Link>
 
       <footer className="mt-24 border-t border-neutral-200 py-10 text-center">
-        <p className="font-display italic text-neutral-400">Find what's in the photo. Then find it cheaper.</p>
+        <p className="font-display italic text-neutral-400">Find what's in the photo. At every price.</p>
       </footer>
     </div>
   );
