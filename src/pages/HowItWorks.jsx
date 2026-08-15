@@ -2,28 +2,28 @@ import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import HowItWorksExample from "@/components/HowItWorksExample";
 
-const isStrawTote = (label = "") => {
-  const l = label.toLowerCase();
-  return l.includes("straw") && l.includes("tote");
-};
+const EXAMPLE_UPLOAD_ID = "6a80cc8894147841f90003e0";
 
 export default function HowItWorks() {
-  const [examples, setExamples] = useState([]);
+  const [example, setExample] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const uploads = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 50);
-      const found = [];
-      for (const u of uploads) {
-        const items = await base44.entities.DetectedItem.filter({ upload_id: u.id });
-        const item = items.find((i) => isStrawTote(i.label));
-        if (!item) continue;
+      const upload = await base44.entities.Upload.get(EXAMPLE_UPLOAD_ID);
+      const items = await base44.entities.DetectedItem.filter({ upload_id: EXAMPLE_UPLOAD_ID });
+      const item = items.find((i) => {
+        const l = (i.label || "").toLowerCase();
+        return l.includes("straw") && l.includes("tote");
+      });
+      if (item) {
         const ms = await base44.entities.ProductMatch.filter({ detected_item_id: item.id });
-        found.push({ upload: u, item, matches: ms.sort((a, b) => a.price - b.price).slice(0, 6) });
-        if (found.length === 2) break;
+        const matches = ms
+          .filter((m) => (m.title || "").toLowerCase().includes("straw tote"))
+          .sort((a, b) => a.price - b.price)
+          .slice(0, 2);
+        setExample({ upload, item, matches });
       }
-      setExamples(found);
       setLoading(false);
     })();
   }, []);
@@ -32,20 +32,22 @@ export default function HowItWorks() {
     <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pt-16">
       <h1 className="font-display text-4xl sm:text-6xl tracking-tight mb-4">How it works</h1>
       <p className="text-neutral-500 text-sm max-w-lg mb-14">
-        Two real looks from the app, start to finish — photo, structured attributes, matches across
+        One real look from the app, start to finish — photo, structured attributes, matches across
         merchants and price points.
       </p>
 
       {loading ? (
         <div className="py-20 text-center text-neutral-400 text-xs uppercase tracking-[0.2em]">
-          Loading examples
+          Loading example
         </div>
-      ) : examples.length === 0 ? (
-        <p className="py-20 text-neutral-400 text-sm">No examples available right now.</p>
+      ) : !example ? (
+        <p className="py-20 text-neutral-400 text-sm">No example available right now.</p>
       ) : (
-        examples.map((e) => (
-          <HowItWorksExample key={e.item.id} upload={e.upload} item={e.item} matches={e.matches} />
-        ))
+        <HowItWorksExample
+          upload={example.upload}
+          item={example.item}
+          matches={example.matches}
+        />
       )}
 
       <p className="max-w-2xl mt-16 text-neutral-600 leading-relaxed text-[15px]">
