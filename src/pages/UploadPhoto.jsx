@@ -10,6 +10,7 @@ export default function UploadPhoto() {
   const [preview, setPreview] = useState(null);
   const [caption, setCaption] = useState("");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     base44.auth.isAuthenticated().then(setAuthed);
@@ -19,15 +20,21 @@ export default function UploadPhoto() {
     if (!file) return;
     setPreview(URL.createObjectURL(file));
     setBusy(true);
-    const { file_url } = await base44.integrations.Core.UploadFile({ file });
-    const upload = await base44.entities.Upload.create({
-      image_url: file_url,
-      caption,
-      is_public: true,
-      status: "analyzing",
-    });
-    await base44.functions.invoke("analyzeUpload", { upload_id: upload.id });
-    navigate(`/results?id=${upload.id}`);
+    setError(null);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const upload = await base44.entities.Upload.create({
+        image_url: file_url,
+        caption,
+        is_public: true,
+        status: "analyzing",
+      });
+      await base44.functions.invoke("analyzeUpload", { upload_id: upload.id });
+      navigate(`/results?id=${upload.id}`);
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message || "Could not analyze this photo.");
+      setBusy(false);
+    }
   };
 
   if (authed === false) {
@@ -57,9 +64,25 @@ export default function UploadPhoto() {
       {preview ? (
         <div className="space-y-6">
           <img src={preview} alt="uploading" className="w-full object-cover max-h-[60vh]" />
-          <p className="text-center text-xs uppercase tracking-[0.2em] text-neutral-400 animate-pulse">
-            {busy ? "Analyzing photo" : "Ready"}
-          </p>
+          {error ? (
+            <div className="border border-[#d1490f] bg-[#faf2ec] p-6">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-[#d1490f] mb-2">Analysis failed</p>
+              <p className="text-sm text-neutral-700">{error}</p>
+              <button
+                onClick={() => {
+                  setError(null);
+                  setPreview(null);
+                }}
+                className="mt-4 text-[11px] uppercase tracking-[0.18em] border-b border-neutral-900 pb-0.5"
+              >
+                Try another photo
+              </button>
+            </div>
+          ) : (
+            <p className="text-center text-xs uppercase tracking-[0.2em] text-neutral-400 animate-pulse">
+              {busy ? "Analyzing photo" : "Ready"}
+            </p>
+          )}
         </div>
       ) : (
         <>

@@ -10,6 +10,7 @@ export default function Results() {
   const [activeId, setActiveId] = useState(null);
   const [matches, setMatches] = useState([]);
   const [matching, setMatching] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!id) return;
@@ -26,12 +27,17 @@ export default function Results() {
     setActiveId(item.id);
     setMatching(true);
     setMatches([]);
-    let found = await base44.entities.ProductMatch.filter({ detected_item_id: item.id });
-    if (found.length === 0) {
-      await base44.functions.invoke("matchItem", { detected_item_id: item.id });
-      found = await base44.entities.ProductMatch.filter({ detected_item_id: item.id });
+    setError(null);
+    try {
+      let found = await base44.entities.ProductMatch.filter({ detected_item_id: item.id });
+      if (found.length === 0) {
+        await base44.functions.invoke("matchItem", { detected_item_id: item.id });
+        found = await base44.entities.ProductMatch.filter({ detected_item_id: item.id });
+      }
+      setMatches(found);
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message || "Could not reach the matching service.");
     }
-    setMatches(found);
     setMatching(false);
   };
 
@@ -60,7 +66,18 @@ export default function Results() {
         <ItemChips items={items} activeId={activeId} onSelect={selectItem} />
       </div>
 
-      {matching ? (
+      {error ? (
+        <div className="mb-16 border border-[#d1490f] bg-[#faf2ec] p-6">
+          <p className="text-[10px] uppercase tracking-[0.2em] text-[#d1490f] mb-2">Match failed</p>
+          <p className="text-sm text-neutral-700">{error}</p>
+          <button
+            onClick={() => items.find((i) => i.id === activeId) && selectItem(items.find((i) => i.id === activeId))}
+            className="mt-4 text-[11px] uppercase tracking-[0.18em] border-b border-neutral-900 pb-0.5"
+          >
+            Try again
+          </button>
+        </div>
+      ) : matching ? (
         <div className="py-16 text-center text-neutral-400 text-xs uppercase tracking-[0.2em]">
           Searching
         </div>
