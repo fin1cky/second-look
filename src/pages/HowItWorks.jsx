@@ -1,76 +1,114 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { base44 } from "@/api/base44Client";
+import ProductCard from "@/components/ProductCard";
 
-const exampleJson = {
-  label: "olive utility jacket",
-  category: "outerwear",
-  color: "olive green",
-  material: "cotton twill",
-  style_descriptors: ["boxy fit", "four patch pockets", "military-inspired", "unlined"],
-  search_query: "olive cotton twill utility jacket boxy patch pockets",
-  confidence: 0.91,
-};
-
-const products = [
-  { title: "Field Utility Jacket", brand: "Alex Mill", price: "$285", shop: "Alex Mill" },
-  { title: "Cotton Twill Overshirt", brand: "Uniqlo U", price: "$69", shop: "Uniqlo", cheap: true },
-  { title: "Vintage M-65 Liner Jacket", brand: "Surplus", price: "$48", shop: "Etsy", cheap: true },
+const FIELDS = [
+  "label",
+  "category",
+  "color",
+  "material",
+  "style_descriptors",
+  "search_query",
+  "confidence",
 ];
 
 export default function HowItWorks() {
+  const [upload, setUpload] = useState(null);
+  const [item, setItem] = useState(null);
+  const [matches, setMatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const uploads = await base44.entities.Upload.filter({ is_public: true }, "-created_date", 5);
+      for (const u of uploads) {
+        const items = await base44.entities.DetectedItem.filter({ upload_id: u.id });
+        for (const i of items) {
+          const ms = await base44.entities.ProductMatch.filter({ detected_item_id: i.id });
+          if (ms.length > 0) {
+            setUpload(u);
+            setItem(i);
+            setMatches(ms.sort((a, b) => a.price - b.price).slice(0, 6));
+            setLoading(false);
+            return;
+          }
+        }
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const itemJson = item
+    ? FIELDS.reduce((acc, f) => {
+        if (item[f] !== undefined && item[f] !== null) acc[f] = item[f];
+        return acc;
+      }, {})
+    : null;
+
   return (
     <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pt-16">
       <h1 className="font-display text-4xl sm:text-6xl tracking-tight mb-4">How it works</h1>
       <p className="text-neutral-500 text-sm max-w-lg mb-14">
-        One worked example, start to finish — photo, structured attributes, matches across merchants
-        and price points.
+        One real look from the app, start to finish — photo, structured attributes, matches across
+        merchants and price points.
       </p>
 
-      <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">1 · The photo</p>
-          <img
-            src="https://images.unsplash.com/photo-1516257984-b1b4d707412e?w=900&q=80"
-            alt="source"
-            className="w-full aspect-[3/4] object-cover bg-neutral-100"
-          />
+      {loading ? (
+        <div className="py-20 text-center text-neutral-400 text-xs uppercase tracking-[0.2em]">
+          Loading example
         </div>
+      ) : !item ? (
+        <p className="py-20 text-neutral-400 text-sm">
+          No analyzed public looks yet — upload a photo to see the pipeline in action.
+        </p>
+      ) : (
+        <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">
+              1 · The photo
+            </p>
+            <img
+              src={upload.image_url}
+              alt={upload.caption || "look"}
+              className="w-full aspect-[3/4] object-cover bg-neutral-100"
+            />
+            {upload.caption && (
+              <p className="font-display italic text-sm mt-3 text-neutral-600">{upload.caption}</p>
+            )}
+          </div>
 
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">
-            2 · What the vision model returned
-          </p>
-          <pre className="font-mono text-[11px] leading-relaxed bg-neutral-900 text-neutral-100 p-5 overflow-x-auto">
-{JSON.stringify(exampleJson, null, 2)}
-          </pre>
-        </div>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">
+              2 · What the vision model returned
+            </p>
+            <pre className="font-mono text-[11px] leading-relaxed bg-neutral-900 text-neutral-100 p-5 overflow-x-auto">
+{JSON.stringify(itemJson, null, 2)}
+            </pre>
+          </div>
 
-        <div>
-          <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">
-            3 · The query, and what came back
-          </p>
-          <p className="font-mono text-[11px] bg-white border border-neutral-200 p-4 mb-6">
-            {exampleJson.search_query}
-          </p>
-          <ul className="space-y-4">
-            {products.map((p) => (
-              <li key={p.title} className="flex items-baseline justify-between gap-4 border-b border-neutral-200 pb-3">
-                <div>
-                  <p className="text-[10px] uppercase tracking-[0.16em] text-neutral-500">{p.brand}</p>
-                  <p className="text-sm">{p.title}</p>
-                </div>
-                <span className={`text-sm ${p.cheap ? "text-[#d1490f]" : ""}`}>{p.price}</span>
-              </li>
-            ))}
-          </ul>
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-neutral-400 mb-4">
+              3 · What came back
+            </p>
+            {item.search_query && (
+              <p className="font-mono text-[11px] bg-white border border-neutral-200 p-4 mb-6">
+                {item.search_query}
+              </p>
+            )}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-8">
+              {matches.map((m) => (
+                <ProductCard key={m.id} product={m} />
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       <p className="max-w-2xl mt-16 text-neutral-600 leading-relaxed text-[15px]">
-        Item attributes are extracted from the photo first — colour, material, silhouette, category —
-        rather than matching pixels. Those attributes are then converted into a structured catalog
-        query, which is what retail search engines actually understand. That query is then run across
-        merchants — new and secondhand alike — to surface the closest available matches at every
-        price point, so you can see the same piece as it exists across the market.
+        Attributes are extracted from the photo first — colour, material, silhouette, category —
+        rather than matching pixels. Those attributes are converted into a structured search run
+        across merchant catalogs, the results are reranked by an LLM for category accuracy, and what
+        survives is presented across price points.
       </p>
     </div>
   );
