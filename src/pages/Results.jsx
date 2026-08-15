@@ -42,12 +42,10 @@ export default function Results() {
   };
 
   const primary = matches.filter((m) => m.tier === "primary").sort((a, b) => a.price - b.price);
-  const mid = matches.filter((m) => m.tier === "mid").sort((a, b) => a.price - b.price);
-  const budget = matches.filter((m) => m.tier === "budget").sort((a, b) => a.price - b.price);
-  const savings =
-    primary.length && budget.length
-      ? Math.round((1 - budget[0].price / primary[0].price) * 100)
-      : null;
+  const alternatives = matches
+    .filter((m) => m.tier === "mid" || m.tier === "budget")
+    .sort((a, b) => a.price - b.price);
+  const primaryLowest = primary.length ? primary[0].price : null;
 
   if (!upload) {
     return <div className="py-32 text-center text-neutral-400 text-xs uppercase tracking-[0.2em]">Loading look</div>;
@@ -93,32 +91,24 @@ export default function Results() {
             </div>
           </section>
 
-          {mid.length > 0 && (
+          {alternatives.length > 0 && (
             <section className="mb-20">
-              <h2 className="font-display text-2xl sm:text-3xl mb-8">Similar, less</h2>
+              <h2 className="font-display text-2xl sm:text-3xl mb-8">Alternatives</h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
-                {mid.map((p) => (
-                  <ProductCard key={p.id} product={p} />
-                ))}
+                {alternatives.map((p) => {
+                  const cheaper = primaryLowest !== null && p.price < primaryLowest;
+                  return (
+                    <ProductCard
+                      key={p.id}
+                      product={p}
+                      accent={cheaper}
+                      savingsPercent={cheaper ? Math.round((1 - p.price / primaryLowest) * 100) : null}
+                    />
+                  );
+                })}
               </div>
             </section>
           )}
-
-          <section className="-mx-5 sm:-mx-8 px-5 sm:px-8 py-14 bg-[#faf2ec] border-y border-[#e8d5c7]">
-            <div className="flex flex-wrap items-baseline gap-4 mb-8">
-              <h2 className="font-display text-2xl sm:text-3xl text-[#d1490f]">Found it cheaper</h2>
-              {savings !== null && (
-                <span className="text-[11px] uppercase tracking-[0.18em] text-[#d1490f] border border-[#d1490f] px-3 py-1">
-                  {savings}% less
-                </span>
-              )}
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
-              {budget.map((p) => (
-                <ProductCard key={p.id} product={p} accent />
-              ))}
-            </div>
-          </section>
         </>
       )}
     </div>

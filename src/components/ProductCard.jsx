@@ -2,7 +2,7 @@ import React from "react";
 import { Image } from "@/components/ui/image";
 import { ExternalLink } from "lucide-react";
 
-export default function ProductCard({ product, accent = false }) {
+export default function ProductCard({ product, accent = false, savingsPercent = null }) {
   return (
     <div className="group">
       <div className="relative overflow-hidden bg-neutral-100 aspect-[3/4]">
@@ -16,6 +16,11 @@ export default function ProductCard({ product, accent = false }) {
         {product.is_secondhand && (
           <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-neutral-700">
             Secondhand
+          </span>
+        )}
+        {savingsPercent !== null && (
+          <span className="absolute top-3 right-3 bg-[#d1490f] px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-white">
+            {savingsPercent}% less
           </span>
         )}
       </div>
