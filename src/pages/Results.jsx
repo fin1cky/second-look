@@ -45,7 +45,6 @@ export default function Results() {
   const alternatives = matches
     .filter((m) => m.tier === "mid" || m.tier === "budget")
     .sort((a, b) => a.price - b.price);
-  const primaryLowest = primary.length ? primary[0].price : null;
 
   if (!upload) {
     return <div className="py-32 text-center text-neutral-400 text-xs uppercase tracking-[0.2em]">Loading look</div>;
@@ -83,7 +82,8 @@ export default function Results() {
       ) : (
         <>
           <section className="mb-20">
-            <h2 className="font-display text-2xl sm:text-3xl mb-8">Shop the look</h2>
+            <h2 className="font-display text-2xl sm:text-3xl">Shop the look</h2>
+            <p className="text-xs text-neutral-500 mt-2 mb-8">Matches across brands and price points.</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
               {primary.map((p) => (
                 <ProductCard key={p.id} product={p} />
@@ -93,19 +93,12 @@ export default function Results() {
 
           {alternatives.length > 0 && (
             <section className="mb-20">
-              <h2 className="font-display text-2xl sm:text-3xl mb-8">Alternatives</h2>
+              <h2 className="font-display text-2xl sm:text-3xl">More like this</h2>
+              <p className="text-xs text-neutral-500 mt-2 mb-8">Matches across brands and price points.</p>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-10">
-                {alternatives.map((p) => {
-                  const cheaper = primaryLowest !== null && p.price < primaryLowest;
-                  return (
-                    <ProductCard
-                      key={p.id}
-                      product={p}
-                      accent={cheaper}
-                      savingsPercent={cheaper ? Math.round((1 - p.price / primaryLowest) * 100) : null}
-                    />
-                  );
-                })}
+                {alternatives.map((p) => (
+                  <ProductCard key={p.id} product={p} />
+                ))}
               </div>
             </section>
           )}

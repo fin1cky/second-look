@@ -29,7 +29,7 @@ export default function Discover() {
         <h1 className="font-display text-4xl sm:text-6xl leading-[1.05] tracking-tight">
           Find what's in the photo.
           <br />
-          <span className="italic text-[#d1490f]">Then find it cheaper.</span>
+          <span className="italic text-[#d1490f]">At every price.</span>
         </h1>
         <p className="mt-5 text-neutral-500 text-sm sm:text-base max-w-md leading-relaxed">
           A lookbook of photos other people have taken apart, piece by piece. Tap any look to see

@@ -21,7 +21,8 @@ export default function HowItWorks() {
     <div className="max-w-[1400px] mx-auto px-5 sm:px-8 pt-16">
       <h1 className="font-display text-4xl sm:text-6xl tracking-tight mb-4">How it works</h1>
       <p className="text-neutral-500 text-sm max-w-lg mb-14">
-        One worked example, start to finish — photo, structured attributes, products.
+        One worked example, start to finish — photo, structured attributes, matches across merchants
+        and price points.
       </p>
 
       <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
@@ -67,9 +68,9 @@ export default function HowItWorks() {
       <p className="max-w-2xl mt-16 text-neutral-600 leading-relaxed text-[15px]">
         Item attributes are extracted from the photo first — colour, material, silhouette, category —
         rather than matching pixels. Those attributes are then converted into a structured catalog
-        query, which is what retail search engines actually understand. Finally the same query is run
-        again with a price ceiling below the best original result, which is how the cheaper
-        alternatives — including secondhand listings — are found.
+        query, which is what retail search engines actually understand. That query is then run across
+        merchants — new and secondhand alike — to surface the closest available matches at every
+        price point, so you can see the same piece as it exists across the market.
       </p>
     </div>
   );
