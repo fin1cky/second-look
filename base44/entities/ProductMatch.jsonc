@@ -1,0 +1,47 @@
+{
+  "name": "ProductMatch",
+  "type": "object",
+  "properties": {
+    "detected_item_id": {
+      "type": "string"
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "primary",
+        "budget"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "brand": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "product_url": {
+      "type": "string"
+    },
+    "shop_name": {
+      "type": "string"
+    },
+    "is_secondhand": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "detected_item_id",
+    "tier",
+    "title"
+  ]
+}

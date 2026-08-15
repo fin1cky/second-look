@@ -1,0 +1,31 @@
+{
+  "name": "Upload",
+  "type": "object",
+  "properties": {
+    "image_url": {
+      "type": "string",
+      "description": "Uploaded photo URL"
+    },
+    "caption": {
+      "type": "string",
+      "description": "Optional caption"
+    },
+    "is_public": {
+      "type": "boolean",
+      "default": true
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "analyzing",
+        "complete",
+        "failed"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "image_url"
+  ]
+}

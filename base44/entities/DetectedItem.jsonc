@@ -1,0 +1,37 @@
+{
+  "name": "DetectedItem",
+  "type": "object",
+  "properties": {
+    "upload_id": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string"
+    },
+    "material": {
+      "type": "string"
+    },
+    "style_descriptors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "search_query": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "upload_id",
+    "label"
+  ]
+}
